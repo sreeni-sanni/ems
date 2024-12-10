@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.abn.emsdata.constant.Constant.*;
+
 @Transactional
 @AllArgsConstructor
 @Service
@@ -35,6 +37,11 @@ public class EmployeeService {
         return employeeMapper.toEmployeeDataResponse(getEmployee(employeeId));
     }
 
+    public EmployeeDataResponse getEmployeeBySurName(String surName){
+        Employee employee=employeeRepository.getEmployeeBySurName(surName);
+        return employeeMapper.toEmployeeDataResponse(employee);
+    }
+
     public EmployeeDataResponse update(Long employeeId, EmployeeDataRequest employeeDataRequest){
         Employee employee =getEmployee(employeeId);
 
@@ -47,20 +54,17 @@ public class EmployeeService {
     }
 
     public String delete(Long employeeId) {
-        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() ->
-                new EmployeeNotFoundException(String.format(
-                        "Employee with id [%d] was not found!", employeeId)));
-        employeeRepository.delete(employee);
-        return "deleted succesfully";
+        employeeRepository.delete(getEmployee(employeeId));
+        return EMPLOYEE_DELETED_SUCCESSFULLY;
     }
 
     private Employee getEmployee(Long employeeId) throws EmployeeNotFoundException {
        return employeeRepository.findById(employeeId).orElseThrow(() -> new EmployeeNotFoundException(String.format(
-                "Employee with id [%d] was not found!", employeeId)));
+               EMPLOYEE_NOT_FOUND, employeeId)));
     }
 
     private Role getRole(Long employeeId) throws RoleNotFoundException {
         return roleRepository.findById(employeeId).orElseThrow(() -> new RoleNotFoundException(String.format(
-                "Role with id [%d] was not found!", employeeId)));
+                ROLE_NOT_FOUND, employeeId)));
     }
 }

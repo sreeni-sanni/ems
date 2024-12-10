@@ -9,11 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 
@@ -33,14 +29,15 @@ public class JwtUtilService {
     }
 
 
-    public String generateToken(String username) {
+    public String generateToken(String username,String role) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", role);
         return Jwts.builder()
                 .claims()
                 .add(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // 5 hours
                 .and()
                 .signWith(getSigningKey())
                 .compact();
@@ -73,18 +70,9 @@ public class JwtUtilService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
-
     private SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(this.secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    private String generateSecretKey() {
-        int length = 32;
-        SecureRandom secureRandom = new SecureRandom();
-        byte[] keyBytes = new byte[length];
-        secureRandom.nextBytes(keyBytes);
-        return Base64.getEncoder().encodeToString(keyBytes);
     }
 
 }

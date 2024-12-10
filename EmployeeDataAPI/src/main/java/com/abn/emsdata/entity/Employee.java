@@ -2,6 +2,7 @@ package com.abn.emsdata.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class Employee {
     @OneToMany(mappedBy = "employee",cascade = CascadeType.ALL)
     private List<Project> projects =new ArrayList<>();
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;

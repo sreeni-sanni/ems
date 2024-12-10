@@ -1,5 +1,9 @@
 package com.abn.ems.auth;
 
+import com.abn.ems.Enums.Role;
+import com.abn.ems.model.EmployeeResponse;
+import com.abn.ems.service.EmployeeService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -9,17 +13,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    private JwtUtilService jwtUtilService;
-    @PostMapping
-    public ResponseEntity<String> getToken(@RequestBody AuthRequest authRequest ) {
 
-        if ("admin".equals(authRequest.getUsername()) && "password".equals(authRequest.getPassword())) {
-           String token= jwtUtilService.generateToken(authRequest.getUsername());
-           if(jwtUtilService.validateToken(token)) {
-              System.out.println("token verified");
-           }else {
-               System.out.println("token verification failed");
-           }
+    private JwtUtilService jwtUtilService;
+
+    private EmployeeService employeeService;
+
+    @PostMapping
+    public ResponseEntity<String> getToken(@RequestBody @Valid AuthRequest authRequest ) {
+
+        EmployeeResponse employee=employeeService.getUser(authRequest.getUsername());
+        if (employee.surName().equalsIgnoreCase(authRequest.getUsername())) {
+           String token= jwtUtilService.generateToken(employee.surName(), Role.getRole(employee.roleId()));
             return ResponseEntity.ok(token);
         }
         throw new RuntimeException("Invalid credentials");

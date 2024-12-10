@@ -1,71 +1,76 @@
 package com.abn.ems.service;
 
+import com.abn.ems.Enums.Role;
+import com.abn.ems.exception.RoleNotFoundException;
 import com.abn.ems.mapper.EmployeeMapper;
 import com.abn.ems.model.EmployeeDataRequest;
 import com.abn.ems.model.EmployeeDataResponse;
 import com.abn.ems.model.EmployeeRequest;
 import com.abn.ems.model.EmployeeResponse;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.ConnectException;
-import java.net.URISyntaxException;
-import java.time.LocalDateTime;
 
-@AllArgsConstructor
+import static com.abn.ems.constant.Constant.*;
+
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class EmployeeService {
 
-    RestTemplate restTemplate;
-    EmployeeMapper employeeMapper;
+    @Value("${api.path}")
+    private String basePath;
 
-    @Retryable(retryFor ={ConnectException.class},maxAttempts = 3,backoff = @Backoff(delay = 2000, multiplier = 2,maxDelay = 12000))
+    private final RestTemplate restTemplate;
+    private final EmployeeMapper employeeMapper;
+
+    @Retryable(retryFor = {ResourceAccessException.class, ConnectException.class}, maxAttempts = 3, backoff = @Backoff(delay = 20000, multiplier = 2, maxDelay = 120000))
     public EmployeeResponse getEmployee(Long id) {
-        System.out.println("inside getEmployee");
-        String url = UriComponentsBuilder.fromPath("/api/employee").queryParam("id", id).build().toUriString();
-        EmployeeDataResponse employeeDataResponse=restTemplate.getForObject(url, EmployeeDataResponse.class);
+        EmployeeDataResponse employeeDataResponse = restTemplate.getForObject(basePath + API_EMPLOYEE_BY_ID, EmployeeDataResponse.class, id);
         return employeeMapper.toEmployeeResponse(employeeDataResponse);
-    }
-    @Retryable(retryFor ={ConnectException.class},maxAttempts = 3,backoff = @Backoff(delay = 2000, multiplier = 2,maxDelay = 12000))
-    public EmployeeResponse create(EmployeeRequest employeeRequest) {
-        EmployeeDataRequest request=employeeMapper.toEmployeeDataRequest(employeeRequest);
-        request.setRoleId(1L);
-        String url = UriComponentsBuilder.fromPath("http://localhost:8089/api/employee").build().toUriString();
-        EmployeeDataResponse employeeDataResponse=restTemplate.postForObject(url,request,EmployeeDataResponse.class);
-        return employeeMapper.toEmployeeResponse(employeeDataResponse);
-    }
-    @Retryable(retryFor ={ConnectException.class},maxAttempts = 3,backoff = @Backoff(delay = 2000, multiplier = 2,maxDelay = 12000))
-    public EmployeeResponse update(Long id, EmployeeRequest employeeRequest) {
-        EmployeeDataRequest request=employeeMapper.toEmployeeDataRequest(employeeRequest);
-        String url = UriComponentsBuilder.fromPath("/").queryParam("id", id).build().toUriString();
-        return restTemplate.exchange(url, HttpMethod.PUT,getHeaders(),EmployeeResponse.class).getBody();
-    }
-    @Retryable(retryFor ={ConnectException.class},maxAttempts = 3,backoff = @Backoff(delay = 2000, multiplier = 2,maxDelay = 12000))
-    public String delete(Long id) {
-        String url = UriComponentsBuilder.fromPath("/").queryParam("id", id).build().toUriString();
-        return restTemplate.exchange(url, HttpMethod.DELETE,getHeaders(),String.class).getBody();
     }
 
-    private HttpEntity<?> getHeaders(){
+    @Retryable(retryFor = {ResourceAccessException.class, ConnectException.class}, maxAttempts = 3, backoff = @Backoff(delay = 20000, multiplier = 2, maxDelay = 120000))
+    public EmployeeResponse getUser(String userName) {
+        EmployeeDataResponse employeeDataResponse = restTemplate.getForObject(basePath + API_EMPLOYEE_BY_NAME, EmployeeDataResponse.class, userName);
+        return employeeMapper.toEmployeeResponse(employeeDataResponse);
+    }
+
+    @Retryable(retryFor = {ResourceAccessException.class,ConnectException.class}, maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 2, maxDelay = 12000))
+    public EmployeeResponse create(EmployeeRequest employeeRequest, String role) {
+        EmployeeDataRequest request = employeeMapper.toEmployeeDataRequest(employeeRequest);
+        request.setRoleId(Role.getRoleId(role));
+        EmployeeDataResponse employeeDataResponse = restTemplate.postForObject(basePath + API_EMPLOYEE, request, EmployeeDataResponse.class);
+        return employeeMapper.toEmployeeResponse(employeeDataResponse);
+    }
+
+    @Retryable(retryFor = {ResourceAccessException.class,ConnectException.class}, maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 2, maxDelay = 12000))
+    public EmployeeResponse update(Long id, EmployeeRequest employeeRequest) {
+        if (Role.getRole(employeeRequest.roleId()) != null) {
+            EmployeeDataRequest request = employeeMapper.toEmployeeDataRequest(employeeRequest);
+            HttpEntity<EmployeeDataRequest> requestEntity = new HttpEntity<>(request);
+            EmployeeDataResponse employeeResponse = restTemplate.exchange(basePath + API_EMPLOYEE_BY_ID, HttpMethod.PUT, requestEntity, EmployeeDataResponse.class, id).getBody();
+            return employeeMapper.toEmployeeResponse(employeeResponse);
+        }
+        throw new RoleNotFoundException(ERROR_MESSAGE_INVALID_ROLE_UPDATE);
+    }
+
+    @Retryable(retryFor = {ResourceAccessException.class,ConnectException.class}, maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 2, maxDelay = 12000))
+    public String delete(Long id) {
+        return restTemplate.exchange(basePath + API_EMPLOYEE_BY_ID, HttpMethod.DELETE, getHeaders(), String.class, id).getBody();
+    }
+
+    private HttpEntity<?> getHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         return new HttpEntity<>(headers);
-    }
-
-    @Recover
-    public String recover(ConnectException e) throws URISyntaxException {
-        log.info("ConnectException recovered at:{}", LocalDateTime.now());
-        return "CouldNotCallAPI";
     }
 }

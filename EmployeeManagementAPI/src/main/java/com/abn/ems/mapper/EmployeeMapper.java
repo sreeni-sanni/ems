@@ -15,12 +15,12 @@ public interface EmployeeMapper {
     EmployeeDataRequest toEmployeeDataRequest(EmployeeRequest employeeRequest);
 
     @Mapping(target = "firstName", source = "name", qualifiedByName = "getFirstName")
-    @Mapping(target = "lastName", source = "name", qualifiedByName = "getLastName")
+    @Mapping(target = "surName", source = "name", qualifiedByName = "getSurName")
     EmployeeResponse toEmployeeResponse(EmployeeDataResponse employeeDataResponse);
 
     @Named("combineName")
     default String combineName(EmployeeRequest employeeRequest) {
-        return employeeRequest.firstName() + " " + employeeRequest.lastName();
+        return employeeRequest.firstName() + " " + employeeRequest.surName();
     }
 
     @Named("getFirstName")
@@ -28,8 +28,9 @@ public interface EmployeeMapper {
         return name.split(" ")[0];
     }
 
-    @Named("getLastName")
-    default String extractLastName(String name) {
+    @Named("getSurName")
+    default String extractSurName(String name) {
         return name.split(" ")[1];
     }
+
 }

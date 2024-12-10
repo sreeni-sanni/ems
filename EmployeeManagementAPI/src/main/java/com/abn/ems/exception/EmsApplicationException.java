@@ -2,16 +2,15 @@ package com.abn.ems.exception;
 
 import java.io.Serial;
 
-public class RoleNotFoundException extends RuntimeException{
+public class EmsApplicationException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public RoleNotFoundException(String message, Throwable throwable) {
+    public EmsApplicationException(String message, Throwable throwable) {
         super(message, throwable);
     }
 
-    public RoleNotFoundException(String message) {
+    public EmsApplicationException(String message) {
         this(message, null);
     }
 }
-
