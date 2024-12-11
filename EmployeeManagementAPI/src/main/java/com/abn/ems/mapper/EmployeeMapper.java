@@ -8,7 +8,18 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
-@Mapper
+
+/**
+ * Mapper interface for mapping EmployeeRequest to EmployeeDataRequest and EmployeeDataResponse to EmployeeResponse.
+ *
+ * <p>This interface uses MapStruct to generate the implementation for converting
+ * between the {@link EmployeeDataRequest}  and the {@link EmployeeRequest}.
+ * The goal of the mapper is to separate the data transformation logic from the service layer.</p>
+ *
+ * <p>The generated implementation will automatically implement the methods defined
+ * in this interface.</p>
+ */
+ @Mapper
 public interface EmployeeMapper {
 
     @Mapping(target = "name", source = ".", qualifiedByName = "combineName")

@@ -1,70 +1,61 @@
 package com.abn.emsdata.service;
 
-import com.abn.emsdata.entity.Employee;
-import com.abn.emsdata.entity.Role;
-import com.abn.emsdata.exception.EmployeeNotFoundException;
-import com.abn.emsdata.exception.RoleNotFoundException;
-import com.abn.emsdata.mapper.EmployeeMapper;
 import com.abn.emsdata.model.EmployeeDataRequest;
 import com.abn.emsdata.model.EmployeeDataResponse;
-import com.abn.emsdata.repository.EmployeeRepository;
-import com.abn.emsdata.repository.RoleRepository;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.abn.emsdata.model.ResponseMessage;
 
-import static com.abn.emsdata.constant.Constant.*;
-
-@Transactional
-@AllArgsConstructor
-@Service
-public class EmployeeService {
-
-    private EmployeeRepository employeeRepository;
-    private RoleRepository roleRepository;
-    private EmployeeMapper employeeMapper;
+/**
+ * EmployeeService is a service class that handles business logic related to employee data.
+ * It provides methods to create, update, retrieve, and delete employee records.
+ *
+ * <p>It interacts with the Employee repository to perform CRUD operations on Employee entities.
+ * This service also handles validation and transformation of employee data before persistence.
+ *
+ * <p>The service layer is typically used by controllers to interact with the employee data, while also enforcing business rules.
+ *
+ * <p>All public methods in this class are expected to be transactional and can throw custom exceptions if an operation fails.
+ */
+public interface EmployeeService {
 
 
-    public EmployeeDataResponse create(EmployeeDataRequest employeeDataRequest){
-        Role role = getRole(employeeDataRequest.roleId());
-        Employee employee = employeeMapper.toEmployee(employeeDataRequest);
-        employee.setRole(role);
-        Employee entity = employeeRepository.saveAndFlush(employee);
-        return employeeMapper.toEmployeeDataResponse(entity);
-    }
+    /**
+     * Creates a new employee.
+     *
+     * @param employeeDataRequest the employee object to be created
+     * @return the created employee object
+     */
+    EmployeeDataResponse create(EmployeeDataRequest employeeDataRequest);
 
-    public EmployeeDataResponse getEmployeeById(Long employeeId){
-        return employeeMapper.toEmployeeDataResponse(getEmployee(employeeId));
-    }
+    /**
+     * Retrieves an employee by their ID.
+     *
+     * @param employeeId the ID of the employee to retrieve
+     * @return the employee with the given ID
+     */
+    EmployeeDataResponse getEmployeeById(Long employeeId);
 
-    public EmployeeDataResponse getEmployeeBySurName(String surName){
-        Employee employee=employeeRepository.getEmployeeBySurName(surName);
-        return employeeMapper.toEmployeeDataResponse(employee);
-    }
+    /**
+     * Retrieves an employee by their surName.
+     *
+     * @param surName the surName of the employee to retrieve
+     * @return the employee with the given surName
+     */
+    EmployeeDataResponse getEmployeeBySurName(String surName);
 
-    public EmployeeDataResponse update(Long employeeId, EmployeeDataRequest employeeDataRequest){
-        Employee employee =getEmployee(employeeId);
+    /**
+     * Updates an existing employee's details.
+     *
+     * @param employeeId          the ID of the employee to update
+     * @param employeeDataRequest the updated employee details
+     * @return the updated employee object
+     */
+    EmployeeDataResponse update(Long employeeId, EmployeeDataRequest employeeDataRequest);
 
-        if(!employee.getRole().getId().equals(employeeDataRequest.roleId())) {
-            employee.setRole(getRole(employeeDataRequest.roleId()));
-        }
-        employeeMapper.updateEmployeeEntity(employeeDataRequest, employee);
-        Employee updatedEmp = employeeRepository.saveAndFlush(employee);
-        return employeeMapper.toEmployeeDataResponse(updatedEmp);
-    }
+    /**
+     * Deletes an employee by their ID.
+     *
+     * @param employeeId the ID of the employee to delete
+     */
+    ResponseMessage delete(Long employeeId);
 
-    public String delete(Long employeeId) {
-        employeeRepository.delete(getEmployee(employeeId));
-        return EMPLOYEE_DELETED_SUCCESSFULLY;
-    }
-
-    private Employee getEmployee(Long employeeId) throws EmployeeNotFoundException {
-       return employeeRepository.findById(employeeId).orElseThrow(() -> new EmployeeNotFoundException(String.format(
-               EMPLOYEE_NOT_FOUND, employeeId)));
-    }
-
-    private Role getRole(Long employeeId) throws RoleNotFoundException {
-        return roleRepository.findById(employeeId).orElseThrow(() -> new RoleNotFoundException(String.format(
-                ROLE_NOT_FOUND, employeeId)));
-    }
 }

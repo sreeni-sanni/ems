@@ -8,11 +8,28 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.function.Function;
 
+import static com.abn.ems.constant.Constant.ALGORITHM;
+import static com.abn.ems.constant.Constant.ROLES;
 
+/**
+ * Utility service for generating, parsing, and validating JSON Web Tokens (JWT).
+ *
+ * <p>The {@code JwtUtilService} provides methods for handling common JWT operations,
+ * such as generating tokens with user details, validating tokens, and extracting claims.
+ * This service uses a secret key for signing tokens and supports token expiration.</p>
+ *
+ * <h3>Key Features:</h3>
+ * <ul>
+ *     <li>Generates JWT tokens with custom claims.</li>
+ *     <li>Validates tokens for authenticity and expiration.</li>
+ *     <li>Extracts specific claims, such as username or roles, from the token payload.</li>
+ * </ul>
+ */
 @Component
 public class JwtUtilService {
 
@@ -20,7 +37,7 @@ public class JwtUtilService {
 
     public JwtUtilService() {
         try {
-            KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
+            KeyGenerator keyGen = KeyGenerator.getInstance(ALGORITHM);
             SecretKey sk = keyGen.generateKey();
             secretKey = Base64.getEncoder().encodeToString(sk.getEncoded());
         } catch (NoSuchAlgorithmException e) {
@@ -28,21 +45,34 @@ public class JwtUtilService {
         }
     }
 
+    /**
+     * Generates a JWT token with the specified subject and claims.
+     *
+     * @param userName the subject (typically the username) of the token. Must not be null or empty.
+     * @param role a map of additional claims to include in the token. Can be empty but not null.
+     * @return a signed JWT token as a {@code String}.
+     */
 
-    public String generateToken(String username,String role) {
+    public String generateToken(String userName,String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", role);
+        claims.put(ROLES, role);
         return Jwts.builder()
                 .claims()
                 .add(claims)
-                .subject(username)
+                .subject(userName)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // 5 hours
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
                 .and()
                 .signWith(getSigningKey())
                 .compact();
     }
 
+    /**
+     * Validates a JWT token for authenticity and expiration.
+     *
+     * @param token the JWT token to validate. Must not be null or empty.
+     * @return {@code true} if the token is valid; {@code false} otherwise.
+     */
     public boolean validateToken(String token) {
         return getUserName(token) != null && !isTokenExpired(token);
     }
@@ -58,6 +88,13 @@ public class JwtUtilService {
         final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
     }
+
+    /**
+     * Extracts the username (subject) from a JWT token.
+     *
+     * @param token the JWT token from which to extract the username. Must not be null or empty.
+     * @return the username (subject) as a {@code String}.
+     */
 
     public String getUserName(String token) {
         return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token).getPayload().getSubject();

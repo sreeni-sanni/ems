@@ -3,6 +3,7 @@ package com.abn.ems.exception;
 import com.abn.ems.model.ErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,41 +19,56 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static com.abn.ems.constant.Constant.*;
-
+/**
+ * Global exception handler for the Employee Management System (EMS) application.
+ *
+ * <p>The {@code EmsControllerAdvice} class is annotated with {@link org.springframework.web.bind.annotation.ControllerAdvice}
+ * and provides centralized exception handling across all controllers in the EMS application.
+ * It ensures that application-specific and system exceptions are properly translated into meaningful
+ * HTTP responses for clients.</p>
+ *
+ * <h3>Key Features:</h3>
+ * <ul>
+ *     <li>Handles custom application exceptions (e.g., {@link com.abn.ems.exception.EmsApplicationException}).</li>
+ *     <li>Translates general exceptions into appropriate HTTP status codes.</li>
+ *     <li>Provides detailed error messages and debugging information in the response.</li>
+ * </ul>
+ */
+@Slf4j
 @RestControllerAdvice
 public class EmsControllerAdvice {
 
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleRoleNotFoundException(RoleNotFoundException exception, WebRequest webRequest) {
+        log.error(" insode role"+EXCEPTION_OCCURRED, exception.getMessage(), exception);
         return ResponseEntity.badRequest().body(getErrorDetails(exception.getMessage(), HttpStatus.BAD_REQUEST, webRequest));
     }
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(AuthorizationDeniedException exception, WebRequest webRequest) {
+        log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(getErrorDetails(exception.getMessage(), HttpStatus.UNAUTHORIZED, webRequest));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception exception, WebRequest webRequest) {
+        log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
         return ResponseEntity.internalServerError().body(getErrorDetails(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR, webRequest));
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(MethodArgumentNotValidException exception, WebRequest webRequest) {
+        log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
         return ResponseEntity.badRequest().body(getErrorDetails(exception.getMessage(), HttpStatus.BAD_REQUEST, webRequest));
     }
 
     @ExceptionHandler(ResourceAccessException.class)
     public ResponseEntity<ErrorResponse> handleResourceAccessException(ResourceAccessException exception, WebRequest webRequest) {
+        log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(getErrorDetails(RESOURCE_UNAVAILABLE, HttpStatus.SERVICE_UNAVAILABLE, webRequest));
-    }
-
-    @ExceptionHandler(HandlerMethodValidationException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(HandlerMethodValidationException exception, WebRequest webRequest) {
-        Optional<String> errorMessage = exception.getAllErrors().stream().map(MessageSourceResolvable::getDefaultMessage).findAny();
-        return errorMessage.map(s -> ResponseEntity.badRequest().body(getErrorDetails(s, HttpStatus.BAD_REQUEST, webRequest))).orElseGet(() -> ResponseEntity.badRequest().body(getErrorDetails(exception.getMessage(), HttpStatus.BAD_REQUEST, webRequest)));
     }
 
     @ExceptionHandler({SignatureException.class, ExpiredJwtException.class})
     public ResponseEntity<ErrorResponse> handleEmployeeNotFoundException(RuntimeException exception, WebRequest webRequest) {
+        log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
         if(exception instanceof SignatureException) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(getErrorDetails(INVALID_JWT_TOKEN, HttpStatus.UNAUTHORIZED, webRequest));
         }else if(exception instanceof ExpiredJwtException) {

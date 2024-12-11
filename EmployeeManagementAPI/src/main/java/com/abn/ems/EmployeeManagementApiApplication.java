@@ -15,10 +15,4 @@ public class EmployeeManagementApiApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(EmployeeManagementApiApplication.class, args);
 	}
-
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
-
 }
