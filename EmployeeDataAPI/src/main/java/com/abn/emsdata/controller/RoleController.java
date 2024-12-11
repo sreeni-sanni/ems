@@ -13,6 +13,6 @@ public class RoleController {
 
     public ResponseEntity<String> deleteRole(Role role) {
         roleService.deleteRole(role);
-
+        return ResponseEntity.ok("Role deleted");
     }
 }

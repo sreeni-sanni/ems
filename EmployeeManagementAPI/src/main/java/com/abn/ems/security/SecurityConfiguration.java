@@ -1,5 +1,6 @@
 package com.abn.ems.security;
 
+import com.abn.ems.auth.JWTAuthenticationProvider;
 import com.abn.ems.filter.JwtAuthFilter;
 import com.abn.ems.filter.RoleFilter;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
 
     JwtAuthFilter jwtAuthFilter;
-    RoleFilter roleFilter;
+
+    JWTAuthenticationProvider jwtAuthenticationProvider;
 
     /**
      * Configures HTTP security, including enabling JWT-based authentication .
@@ -49,6 +51,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests((authorize) ->
                         authorize.requestMatchers(AUTH_WHITELIST).permitAll()
                                 .anyRequest().authenticated())
+                .authenticationProvider(jwtAuthenticationProvider)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();

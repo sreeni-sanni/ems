@@ -18,8 +18,12 @@ import java.io.IOException;
 import static com.abn.ems.constant.Constant.*;
 
 /**
- * A filter that checks whether the incoming HTTP request contains a valid role header.
- * If the role is missing or invalid, the request will be rejected .
+ * A role filter for validating the "Role" header in incoming HTTP requests.
+ * <p>
+ * This filter ensures that a valid role is present in the request header. If the
+ * header is missing or contains an invalid role , the filter prevents further processing
+ * and returns an appropriate error response to the client.
+ * </p>
  */
 
 @Component
@@ -32,6 +36,19 @@ public class RoleFilter extends OncePerRequestFilter {
         this.resolver = resolver;
     }
 
+    /**
+     * Performs validation of the "Role" header in the HTTP request.
+     * <p>
+     * If the "Role" header is missing or invalid, this method sets an error
+     * response and terminates further processing of the request.
+     * </p>
+     *
+     * @param request the {@code ServletRequest} object.
+     * @param response the {@code ServletResponse} object.
+     * @param filterChain the {@code FilterChain} to pass the request to the next filter.
+     * @throws IOException if an I/O error occurs during request processing.
+     * @throws ServletException if an error occurs during request processing.
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         if (AUTH_TOKEN.equals(request.getRequestURI())) {

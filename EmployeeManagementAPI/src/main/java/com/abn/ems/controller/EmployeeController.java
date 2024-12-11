@@ -4,9 +4,10 @@ import com.abn.ems.model.EmployeeRequest;
 import com.abn.ems.model.EmployeeResponse;
 import com.abn.ems.model.ResponseMessage;
 import com.abn.ems.service.EmployeeService;
-import com.abn.ems.validation.IsValidRole;
+import jakarta.annotation.Nonnull;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class EmployeeController {
      */
     @PreAuthorize(HAS_ADMIN_ROLE)
     @PostMapping
-    public ResponseEntity<EmployeeResponse> employee(@RequestBody @Valid EmployeeRequest employeeRequest,@RequestHeader("Role") @IsValidRole String role) {
+    public ResponseEntity<EmployeeResponse> employee(@RequestBody @Valid EmployeeRequest employeeRequest,@RequestHeader("Role") String role) {
         return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.create(employeeRequest,role));
     }
 
@@ -62,7 +63,7 @@ public class EmployeeController {
      */
     @PreAuthorize(HAS_USER_ROLE)
     @GetMapping({"/{id}"})
-    public ResponseEntity<EmployeeResponse> getEmployee(@PathVariable  @NotEmpty Long id) {
+    public ResponseEntity<EmployeeResponse> getEmployee(@PathVariable  @Nonnull Long id) {
         return ResponseEntity.ok(employeeService.getEmployee(id));
     }
 
@@ -75,7 +76,7 @@ public class EmployeeController {
      */
     @PreAuthorize(HAS_USER_ROLE)
     @PutMapping ("/{id}")
-    public ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable  @NotEmpty Long id,@RequestBody  @Valid EmployeeRequest employeeRequest, @RequestHeader("Role") @IsValidRole String role) {
+    public ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable  @NotEmpty Long id,@RequestBody  @Valid EmployeeRequest employeeRequest) {
         return ResponseEntity.ok(employeeService.update(id,employeeRequest));
     }
 
@@ -87,7 +88,7 @@ public class EmployeeController {
      */
     @PreAuthorize(HAS_ADMIN_ROLE)
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseMessage> deleteEmployee(@PathVariable @NotEmpty Long id) {
+    public ResponseEntity<ResponseMessage> deleteEmployee(@PathVariable @Nonnull Long id) {
         return ResponseEntity.ok(employeeService.delete(id));
     }
 }

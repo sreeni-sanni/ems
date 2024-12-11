@@ -89,6 +89,11 @@ public class JwtUtilService {
         return claimResolver.apply(claims);
     }
 
+    public String getRole(String token) {
+        Claims claims= extractAllClaims(token);
+        return claims.get(ROLES,String.class);
+    }
+
     /**
      * Extracts the username (subject) from a JWT token.
      *

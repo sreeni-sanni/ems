@@ -39,7 +39,7 @@ public class EmployeeController {
      */
 
     @PostMapping
-    public ResponseEntity<EmployeeDataResponse> employee(@RequestBody @Valid EmployeeDataRequest employeeDataRequest) throws RoleNotFoundException {
+    public ResponseEntity<EmployeeDataResponse> employee(@RequestBody @Valid EmployeeDataRequest employeeDataRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(employeeService.create(employeeDataRequest));
     }
 
@@ -52,7 +52,7 @@ public class EmployeeController {
      * @throws EmployeeNotFoundException if no employee with the given ID is found
      */
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeDataResponse> updateEmployee( @PathVariable @NotEmpty Long id,@RequestBody @Valid EmployeeDataRequest employeeDataRequest) {
+    public ResponseEntity<EmployeeDataResponse> updateEmployee( @PathVariable @Nonnull Long id,@RequestBody @Valid EmployeeDataRequest employeeDataRequest) {
         return ResponseEntity.ok(employeeService.update(id,employeeDataRequest));
     }
     /**
@@ -63,7 +63,7 @@ public class EmployeeController {
      * @throws EmployeeNotFoundException if no employee with the given ID is found
      */
     @GetMapping("{id}")
-    public ResponseEntity<EmployeeDataResponse> getEmployee(@PathVariable @NotEmpty Long id) {
+    public ResponseEntity<EmployeeDataResponse> getEmployee(@PathVariable @Nonnull Long id) {
         return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
@@ -87,7 +87,7 @@ public class EmployeeController {
      * @throws EmployeeNotFoundException if no employee with the given ID is found
      */
     @DeleteMapping("{id}")
-    public ResponseEntity<ResponseMessage> deleteEmployee(@PathVariable @NotEmpty Long id) {
+    public ResponseEntity<ResponseMessage> deleteEmployee(@PathVariable @Nonnull Long id) {
         return ResponseEntity.ok(employeeService.delete(id));
     }
 }

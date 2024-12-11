@@ -21,7 +21,7 @@ public class Employee {
 
     @OneToMany(mappedBy = "employee",cascade = CascadeType.ALL)
     private List<Project> projects =new ArrayList<>();
-
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;

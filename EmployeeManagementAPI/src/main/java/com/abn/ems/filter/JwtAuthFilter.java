@@ -1,6 +1,7 @@
 package com.abn.ems.filter;
 
 import com.abn.ems.Enums.Role;
+import com.abn.ems.auth.JWTAuthenticationProvider;
 import com.abn.ems.auth.JwtUtilService;
 import com.abn.ems.exception.EmsApplicationException;
 import com.abn.ems.model.EmployeeResponse;
@@ -48,6 +49,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private JwtUtilService jwtUtilService;
     private EmployeeService employeeService;
+    private JWTAuthenticationProvider provider;
 
     /**
      * Filters the incoming request to validate the JWT token.
@@ -66,20 +68,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
 
-        if ("/auth/token".equals(request.getRequestURI())) {
+        if (AUTH_TOKEN.equals(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
         }
         String token = getTokenFromRequest(request);
         if (StringUtils.hasText(token) && jwtUtilService.validateToken(token)) {
-            String username = jwtUtilService.getUserName(token);
-            EmployeeResponse employee = employeeService.getUser(username);
-            List<GrantedAuthority> authoritiesList = new ArrayList<GrantedAuthority>();
-            authoritiesList.add(new SimpleGrantedAuthority("ROLE_" + Role.getRole(employee.roleId())));
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(username, null, authoritiesList);
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            Authentication authentication = provider.authenticate( new UsernamePasswordAuthenticationToken(token, token));
+            if(authentication != null) {
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
         filterChain.doFilter(request, response);
     }
