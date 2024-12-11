@@ -41,7 +41,7 @@ import static com.abn.ems.constant.Constant.*;
 @RequestMapping(EMPLOYEE_URI_PATH)
 public class EmployeeController {
 
-    EmployeeService employeeService;
+    private EmployeeService employeeService;
 
     /**
      * Creates a new employee.

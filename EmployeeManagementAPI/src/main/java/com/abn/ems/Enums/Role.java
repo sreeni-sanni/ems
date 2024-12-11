@@ -3,6 +3,8 @@ package com.abn.ems.Enums;
 import com.abn.ems.exception.RoleNotFoundException;
 import lombok.Getter;
 
+import static com.abn.ems.constant.Constant.ROLE_NOT_FOUND;
+
 /**
  * Enum representing the various roles available in the application.
  *
@@ -38,9 +40,7 @@ public enum Role {
      */
     public static boolean isValidRole(String role) {
         for (Role r : Role.values()) {
-            if (r.role.equalsIgnoreCase(role)) {
-                return true;
-            }
+            return r.role.equalsIgnoreCase(role);
         }
         return false;
     }
@@ -58,7 +58,7 @@ public enum Role {
                 return role.getRole();
             }
         }
-        throw new RoleNotFoundException("Role not found");
+        throw new RoleNotFoundException(String.format(ROLE_NOT_FOUND,id));
     }
 
     /**
@@ -74,7 +74,7 @@ public enum Role {
                 return r.getId();
             }
         }
-        throw new RoleNotFoundException("Role not found");
+        throw new RoleNotFoundException(String.format(ROLE_NOT_FOUND,role));
     }
 
 }

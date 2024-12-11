@@ -1,6 +1,6 @@
 package com.abn.ems.constant;
 
-public abstract class Constant {
+public final class Constant {
 
     public static final String API_EMPLOYEE = "/api/employees";
     public static final String API_EMPLOYEE_BY_ID = "/api/employees/{id}";
@@ -23,5 +23,6 @@ public abstract class Constant {
     public static final String HAS_ADMIN_ROLE = "hasRole('ROLE_ADMIN')";
     public static final String HAS_USER_ROLE ="hasRole('ROLE_USER')";
     public static final String EXCEPTION_OCCURRED="Exception occurred: {}";
+    public static final String ROLE_NOT_FOUND="Role [%s] not found";
 }
 

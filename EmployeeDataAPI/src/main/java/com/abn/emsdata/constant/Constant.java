@@ -1,6 +1,6 @@
 package com.abn.emsdata.constant;
 
-public abstract class Constant {
+public final class Constant {
 
 
     public static final String EMPLOYEE_NOT_FOUND="Employee with id [%d] was not found!";

@@ -28,7 +28,7 @@ import static com.abn.emsdata.constant.Constant.USER_NAME;
 @RequestMapping(API_EMPLOYEE)
 public class EmployeeController {
 
-    EmployeeService employeeService;
+    private EmployeeService employeeService;
 
     /**
      * Creates a new employee.
