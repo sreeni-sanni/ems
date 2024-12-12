@@ -76,7 +76,7 @@ public class EmployeeController {
      */
     @PreAuthorize(HAS_USER_ROLE)
     @PutMapping ("/{id}")
-    public ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable  @NotEmpty Long id,@RequestBody  @Valid EmployeeRequest employeeRequest) {
+    public ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable  @Nonnull Long id,@RequestBody  @Valid EmployeeRequest employeeRequest) {
         return ResponseEntity.ok(employeeService.update(id,employeeRequest));
     }
 
