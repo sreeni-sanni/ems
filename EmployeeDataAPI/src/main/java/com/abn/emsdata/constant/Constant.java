@@ -7,6 +7,7 @@ public final class Constant {
     public static final String ROLE_NOT_FOUND="Role with id [%d] was not found!";
     public static final String EMPLOYEE_DELETED_SUCCESSFULLY="Employee deleted successfully";
     public static final String API_EMPLOYEE="/api/employees";
+    public static final String API_ROLE="/api/roles";
     public static final String USER_NAME="/userName";
     public static final String EMPLOYEE_NOT_FOUND_BY_NAME="Employee with id [%s] was not found!";
     public static final String ROLE_DELETED="Role deleted successfully";

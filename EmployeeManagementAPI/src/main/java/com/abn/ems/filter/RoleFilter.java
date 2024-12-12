@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import static com.abn.ems.constant.Constant.*;
 
@@ -43,29 +44,28 @@ public class RoleFilter extends OncePerRequestFilter {
      * response and terminates further processing of the request.
      * </p>
      *
-     * @param request the {@code ServletRequest} object.
-     * @param response the {@code ServletResponse} object.
+     * @param request     the {@code ServletRequest} object.
+     * @param response    the {@code ServletResponse} object.
      * @param filterChain the {@code FilterChain} to pass the request to the next filter.
-     * @throws IOException if an I/O error occurs during request processing.
+     * @throws IOException      if an I/O error occurs during request processing.
      * @throws ServletException if an error occurs during request processing.
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        if (AUTH_TOKEN.equals(request.getRequestURI())) {
+
+        if ((request.getRequestURI().startsWith(AUTH_TOKEN) || request.getRequestURI().startsWith(SWAGGER_UI) || request.getRequestURI().startsWith(SWAGGER_V3_API))) {
             filterChain.doFilter(request, response);
             return;
         }
         String role = request.getHeader(ROLE);
         try {
-            if (role != null && (role.length() >= 3 && role.length() <= 50) && Role.isValidRole(role)) {
-                Role.valueOf(role.toUpperCase());
+            if (role != null && (role.length() > 3 && role.length() < 50) && Role.isValidRole(role)) {
+                filterChain.doFilter(request, response);
             } else {
                 throw new RoleNotFoundException(ROLE_MISSING);
             }
-            filterChain.doFilter(request, response);
         } catch (RuntimeException | ServletException e) {
             resolver.resolveException(request, response, null, e);
-            ;
         }
     }
 }

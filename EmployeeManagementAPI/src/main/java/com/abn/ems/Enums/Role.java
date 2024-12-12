@@ -40,7 +40,9 @@ public enum Role {
      */
     public static boolean isValidRole(String role) {
         for (Role r : Role.values()) {
-            return r.role.equalsIgnoreCase(role);
+            if(r.role.equalsIgnoreCase(role)){
+                return true;
+            }
         }
         return false;
     }

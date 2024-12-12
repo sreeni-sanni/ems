@@ -1,5 +1,6 @@
 package com.abn.emsdata.service;
 
+import com.abn.emsdata.exception.RoleNotFoundException;
 import com.abn.emsdata.model.Role;
 import com.abn.emsdata.repository.RoleRepository;
 import lombok.AllArgsConstructor;
@@ -14,9 +15,19 @@ import static com.abn.emsdata.constant.Constant.ROLE_DELETED;
 public class RoleServiceImpl implements RoleService{
     RoleRepository roleRepository;
 
+    /**
+     *  Deletes an existing role from the system.
+     *
+     * @param roleId the ID of the role to delete
+     * @return
+     */
     @Override
-    public String deleteRole(Role role) {
-        roleRepository.deleteRoleById(role.id());
+    public String deleteRole(Long roleId) {
+        try {
+            roleRepository.deleteById(roleId);
+        }catch (Exception e){
+            throw new RoleNotFoundException(e.getMessage());
+        }
         return ROLE_DELETED;
     }
 }

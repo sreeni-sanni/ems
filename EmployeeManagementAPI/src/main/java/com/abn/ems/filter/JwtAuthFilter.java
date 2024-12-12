@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,8 +25,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static com.abn.ems.constant.Constant.*;
+import static java.util.Arrays.stream;
 
 /**
  * Filter for processing and validating JWT tokens in incoming HTTP requests.
@@ -45,6 +48,7 @@ import static com.abn.ems.constant.Constant.*;
  */
 @AllArgsConstructor
 @Component
+@Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private JwtUtilService jwtUtilService;
@@ -66,16 +70,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-
-        if (AUTH_TOKEN.equals(request.getRequestURI())) {
+        if ((request.getRequestURI().startsWith(AUTH_TOKEN) || request.getRequestURI().startsWith(SWAGGER_UI) || request.getRequestURI().startsWith(SWAGGER_V3_API))) {
             filterChain.doFilter(request, response);
             return;
         }
         String token = getTokenFromRequest(request);
         if (StringUtils.hasText(token) && jwtUtilService.validateToken(token)) {
-            Authentication authentication = provider.authenticate( new UsernamePasswordAuthenticationToken(token, token));
-            if(authentication != null) {
+            Authentication authentication = provider.authenticate(new UsernamePasswordAuthenticationToken(token, token));
+            if (authentication != null) {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }

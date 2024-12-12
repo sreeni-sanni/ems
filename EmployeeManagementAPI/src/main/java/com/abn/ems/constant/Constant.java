@@ -20,6 +20,8 @@ public final class Constant {
     public static final String ROLE = "Role";
     public static final String EMPLOYEE_URI_PATH = "/employees";
     public static final String AUTH_TOKEN = "/auth/token";
+    public static final String SWAGGER_UI="/swagger-ui/";
+    public static final String SWAGGER_V3_API="/v3/api-docs";
     public static final String HAS_ADMIN_ROLE = "hasRole('ROLE_ADMIN')";
     public static final String HAS_USER_ROLE ="hasRole('ROLE_USER')";
     public static final String EXCEPTION_OCCURRED="Exception occurred: {}";

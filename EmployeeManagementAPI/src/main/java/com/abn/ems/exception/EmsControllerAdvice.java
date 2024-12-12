@@ -40,7 +40,12 @@ public class EmsControllerAdvice {
 
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleRoleNotFoundException(RoleNotFoundException exception, WebRequest webRequest) {
-        log.error(" insode role"+EXCEPTION_OCCURRED, exception.getMessage(), exception);
+        log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
+        return ResponseEntity.badRequest().body(getErrorDetails(exception.getMessage(), HttpStatus.BAD_REQUEST, webRequest));
+    }
+    @ExceptionHandler(EmsApplicationException.class)
+    public ResponseEntity<ErrorResponse> handleEmsApplicationException(EmsApplicationException exception, WebRequest webRequest) {
+        log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
         return ResponseEntity.badRequest().body(getErrorDetails(exception.getMessage(), HttpStatus.BAD_REQUEST, webRequest));
     }
     @ExceptionHandler(AuthorizationDeniedException.class)

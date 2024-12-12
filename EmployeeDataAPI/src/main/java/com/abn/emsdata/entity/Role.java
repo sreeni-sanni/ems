@@ -10,7 +10,8 @@ import java.util.UUID;
 @Data
 public class Role {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "customerSeqGenerator")
+    @SequenceGenerator(name = "customerSeqGenerator", sequenceName = "customer_sequence", allocationSize = 1)
     private Long id;
     @Column
     private String name;
