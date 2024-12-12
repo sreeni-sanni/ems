@@ -1,7 +1,5 @@
-package com.abn.ems.auth;
+package com.abn.ems.auth.service;
 
-import com.abn.ems.Enums.Role;
-import com.abn.ems.model.EmployeeResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

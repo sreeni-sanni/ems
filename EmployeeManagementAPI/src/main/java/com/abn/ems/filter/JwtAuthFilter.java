@@ -1,31 +1,28 @@
 package com.abn.ems.filter;
 
-import com.abn.ems.Enums.Role;
-import com.abn.ems.auth.JWTAuthenticationProvider;
-import com.abn.ems.auth.JwtUtilService;
+import com.abn.ems.auth.service.JWTAuthenticationProvider;
+import com.abn.ems.auth.service.JwtUtilService;
 import com.abn.ems.exception.EmsApplicationException;
-import com.abn.ems.model.EmployeeResponse;
+import com.abn.ems.exception.JwtException;
 import com.abn.ems.service.EmployeeService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 import static com.abn.ems.constant.Constant.*;
 import static java.util.Arrays.stream;
@@ -41,7 +38,7 @@ import static java.util.Arrays.stream;
  * <h3>Key Responsibilities:</h3>
  * <ul>
  *     <li>Extracts the JWT token from the `Authorization` header.</li>
- *     <li>Validates the token using a {@link com.abn.ems.auth.JwtUtilService} utilityService class.</li>
+ *     <li>Validates the token using a {@link JwtUtilService} utilityService class.</li>
  *     <li>Sets the authentication details in the {@code SecurityContext} if the token is valid.</li>
  *     <li>Delegates the request to the next filter in the chain if the token is invalid or missing.</li>
  * </ul>
@@ -75,10 +72,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
         String token = getTokenFromRequest(request);
-        if (StringUtils.hasText(token) && jwtUtilService.validateToken(token)) {
-            Authentication authentication = provider.authenticate(new UsernamePasswordAuthenticationToken(token, token));
-            if (authentication != null) {
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            if (StringUtils.hasText(token) && jwtUtilService.validateToken(token)) {
+                Authentication authentication = provider.authenticate(new UsernamePasswordAuthenticationToken(token, token));
+                if (authentication != null) {
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            }
+        } catch (SignatureException | ExpiredJwtException exe) {
+            if (exe instanceof SignatureException) {
+                throw new JwtException(INVALID_JWT_TOKEN);
+            } else {
+                throw new JwtException(TOKEN_EXPIRED);
             }
         }
         filterChain.doFilter(request, response);

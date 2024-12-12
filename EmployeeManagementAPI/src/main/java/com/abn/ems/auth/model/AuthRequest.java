@@ -1,4 +1,4 @@
-package com.abn.ems.auth;
+package com.abn.ems.auth.model;
 
 import jakarta.validation.constraints.NotEmpty;
 

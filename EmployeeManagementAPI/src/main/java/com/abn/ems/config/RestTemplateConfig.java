@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 public class RestTemplateConfig {
     @Bean
     public RestTemplate restTemplate() {
-        //need add further required RestTemplate configuration if required.
+       /* Can be configured for SSL further ensuring secure communication with downstream api*/
         return new RestTemplate();
     }
 

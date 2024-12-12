@@ -71,14 +71,9 @@ public class EmsControllerAdvice {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(getErrorDetails(RESOURCE_UNAVAILABLE, HttpStatus.SERVICE_UNAVAILABLE, webRequest));
     }
 
-    @ExceptionHandler({SignatureException.class, ExpiredJwtException.class})
-    public ResponseEntity<ErrorResponse> handleEmployeeNotFoundException(RuntimeException exception, WebRequest webRequest) {
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ErrorResponse> handleJwtException(JwtException exception, WebRequest webRequest) {
         log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
-        if(exception instanceof SignatureException) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(getErrorDetails(INVALID_JWT_TOKEN, HttpStatus.UNAUTHORIZED, webRequest));
-        }else if(exception instanceof ExpiredJwtException) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(getErrorDetails(TOKEN_EXPIRED, HttpStatus.UNAUTHORIZED, webRequest));
-        }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(getErrorDetails(exception.getMessage(), HttpStatus.UNAUTHORIZED, webRequest));
     }
 

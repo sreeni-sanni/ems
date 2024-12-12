@@ -1,8 +1,8 @@
 package com.abn.ems.controller;
 
-import com.abn.ems.auth.AuthController;
-import com.abn.ems.auth.AuthRequest;
-import com.abn.ems.auth.JwtUtilService;
+import com.abn.ems.auth.controller.AuthController;
+import com.abn.ems.auth.model.AuthRequest;
+import com.abn.ems.auth.service.JwtUtilService;
 import com.abn.ems.model.EmployeeResponse;
 import com.abn.ems.service.EmployeeService;
 import org.junit.jupiter.api.Test;

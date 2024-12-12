@@ -8,7 +8,6 @@ public final class Constant {
     public static final String ERROR_MESSAGE_INVALID_ROLE_UPDATE="Please provide a valid role";
     public static final String INVALID_JWT_TOKEN="Invalid JWT token";
     public static final String TOKEN_EXPIRED="JWT token has expired";
-    public static final String INVALID_ROLE="Invalid role provided in the header";
     public static final String RESOURCE_UNAVAILABLE="System is currently unable to process your request due to an issue with a downstream service. Please try again later.";
     public static final String USER_NOT_FOUND="The specified username was not found. Please check the username and try again.";
     public static final String ALGORITHM = "HmacSHA256";
