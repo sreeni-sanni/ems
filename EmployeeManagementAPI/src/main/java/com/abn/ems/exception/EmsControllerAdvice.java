@@ -1,6 +1,9 @@
 package com.abn.ems.exception;
 
 import com.abn.ems.model.ErrorResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +34,10 @@ import static com.abn.ems.constants.Constant.*;
  */
 @Slf4j
 @RestControllerAdvice
+@AllArgsConstructor
 public class EmsControllerAdvice {
+
+    ObjectMapper objectMapper;
 
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleRoleNotFoundException(RoleNotFoundException exception, WebRequest webRequest) {
@@ -43,6 +49,12 @@ public class EmsControllerAdvice {
         log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
         return ResponseEntity.badRequest().body(getErrorDetails(exception.getMessage(), HttpStatus.BAD_REQUEST, webRequest));
     }
+    @ExceptionHandler(EmployeeDataAPIException.class)
+    public ResponseEntity<ErrorResponse> handleRoleNotFoundException(EmployeeDataAPIException exception, WebRequest webRequest) throws JsonProcessingException {
+        log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
+        return ResponseEntity.badRequest().body(getErrorDetails(getMessage(exception.getMessage()), HttpStatus.BAD_REQUEST, webRequest));
+    }
+
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(AuthorizationDeniedException exception, WebRequest webRequest) {
         log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
@@ -74,6 +86,10 @@ public class EmsControllerAdvice {
 
     private ErrorResponse getErrorDetails(String message, HttpStatus status, WebRequest webRequest) {
         return new ErrorResponse(message, status.value(), webRequest.getDescription(false), LocalDateTime.now());
+    }
+
+    private String getMessage(String message) throws JsonProcessingException {
+        return objectMapper.readTree(message).get("message").asText();
     }
 
 

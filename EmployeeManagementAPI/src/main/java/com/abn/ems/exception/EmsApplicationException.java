@@ -28,4 +28,5 @@ public class EmsApplicationException extends RuntimeException {
     public EmsApplicationException(String message) {
         this(message, null);
     }
+
 }

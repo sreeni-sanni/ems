@@ -1,6 +1,7 @@
 package com.abn.ems.service;
 
 import com.abn.ems.Enums.Role;
+import com.abn.ems.exception.EmployeeDataAPIException;
 import com.abn.ems.exception.RoleNotFoundException;
 import com.abn.ems.mapper.EmployeeMapper;
 import com.abn.ems.model.*;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
@@ -60,7 +62,14 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Retryable(retryFor = {ResourceAccessException.class}, maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 2, maxDelay = 120000))
     public EmployeeResponse getUser(String userName) {
-        EmployeeDataResponse employeeDataResponse = restTemplate.getForObject(basePath + API_EMPLOYEE_BY_NAME, EmployeeDataResponse.class, userName);
+        EmployeeDataResponse employeeDataResponse;
+
+        try {
+            employeeDataResponse = restTemplate.getForObject(basePath + API_EMPLOYEE_BY_NAME, EmployeeDataResponse.class, userName);
+        } catch (HttpClientErrorException e) {
+            throw new EmployeeDataAPIException(e.getResponseBodyAsString());
+        }
+
         return employeeMapper.toEmployeeResponse(employeeDataResponse);
     }
 
@@ -75,9 +84,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Retryable(retryFor = {ResourceAccessException.class}, maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 2, maxDelay = 12000))
     @Override
     public EmployeeResponse create(EmployeeRequest employeeRequest, String role) {
+        EmployeeDataResponse employeeDataResponse;
         EmployeeDataRequest request = employeeMapper.toEmployeeDataRequest(employeeRequest);
         request.setRoleId(Role.getRoleId(role));
-        EmployeeDataResponse employeeDataResponse = restTemplate.postForObject(basePath + API_EMPLOYEE, request, EmployeeDataResponse.class);
+        try {
+            employeeDataResponse = restTemplate.postForObject(basePath + API_EMPLOYEE, request, EmployeeDataResponse.class);
+        } catch (HttpClientErrorException e) {
+            throw new EmployeeDataAPIException(e.getResponseBodyAsString());
+        }
         return employeeMapper.toEmployeeResponse(employeeDataResponse);
     }
 
@@ -99,7 +113,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (Role.getRole(employeeRequest.roleId()) != null) {
             EmployeeDataRequest request = employeeMapper.toEmployeeDataRequest(employeeRequest);
             HttpEntity<EmployeeDataRequest> requestEntity = new HttpEntity<>(request);
-            EmployeeDataResponse employeeResponse = restTemplate.exchange(basePath + API_EMPLOYEE_BY_ID, HttpMethod.PUT, requestEntity, EmployeeDataResponse.class, id).getBody();
+            EmployeeDataResponse employeeResponse;
+            try {
+                employeeResponse = restTemplate.exchange(basePath + API_EMPLOYEE_BY_ID, HttpMethod.PUT, requestEntity, EmployeeDataResponse.class, id).getBody();
+            } catch (HttpClientErrorException e) {
+                throw new EmployeeDataAPIException(e.getResponseBodyAsString());
+            }
             return employeeMapper.toEmployeeResponse(employeeResponse);
         }
         throw new RoleNotFoundException(ERROR_MESSAGE_INVALID_ROLE_UPDATE);
@@ -117,7 +136,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Retryable(retryFor = {ResourceAccessException.class}, maxAttempts = 3, backoff = @Backoff(delay = 2000, multiplier = 2, maxDelay = 12000))
     @Override
     public ResponseMessage delete(Long id) {
-        return restTemplate.exchange(basePath + API_EMPLOYEE_BY_ID, HttpMethod.DELETE, getHeaders(), ResponseMessage.class, id).getBody();
+        try {
+            return restTemplate.exchange(basePath + API_EMPLOYEE_BY_ID, HttpMethod.DELETE, getHeaders(), ResponseMessage.class, id).getBody();
+        } catch (HttpClientErrorException e) {
+            throw new EmployeeDataAPIException(e.getResponseBodyAsString());
+        }
     }
 
     private HttpEntity<?> getHeaders() {
