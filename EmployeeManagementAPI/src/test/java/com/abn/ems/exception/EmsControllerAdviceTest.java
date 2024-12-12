@@ -9,15 +9,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.context.request.WebRequest;
 
-import static com.abn.ems.constant.Constant.INVALID_JWT_TOKEN;
-import static com.abn.ems.constant.Constant.TOKEN_EXPIRED;
+import static com.abn.ems.constants.Constant.INVALID_JWT_TOKEN;
+import static com.abn.ems.constants.Constant.TOKEN_EXPIRED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -42,13 +41,10 @@ public class EmsControllerAdviceTest {
     WebRequest webRequest;
 
     @Mock
-    SignatureException signatureException;
-
-    @Mock
-    ExpiredJwtException expiredJwtException;
-
-    @Mock
     RuntimeException runtimeException;
+
+    @Mock
+    JwtException jwtException;
 
     @Mock
     AuthorizationDeniedException authorizationDeniedException;
@@ -69,7 +65,7 @@ public class EmsControllerAdviceTest {
 
     @Test
     void testSignatureException(){
-        ResponseEntity<ErrorResponse> response = emsControllerAdvice.handleEmployeeNotFoundException(signatureException,webRequest);
+        ResponseEntity<ErrorResponse> response = emsControllerAdvice.handleJwtException(new JwtException(INVALID_JWT_TOKEN),webRequest);
         assertNotNull(response.getBody());
         assertEquals(response.getBody().statusCode(), UNAUTHORIZED_STATUS_CODE);
         assertEquals(response.getBody().message(), INVALID_JWT_TOKEN);
@@ -77,17 +73,10 @@ public class EmsControllerAdviceTest {
 
     @Test
     void testExpiredJwtException(){
-        ResponseEntity<ErrorResponse> response = emsControllerAdvice.handleEmployeeNotFoundException(expiredJwtException,webRequest);
+        ResponseEntity<ErrorResponse> response = emsControllerAdvice.handleJwtException(new JwtException(TOKEN_EXPIRED),webRequest);
         assertNotNull(response.getBody());
         assertEquals(response.getBody().statusCode(), UNAUTHORIZED_STATUS_CODE);
         assertEquals(response.getBody().message(), TOKEN_EXPIRED);
-    }
-
-    @Test
-    void testEmployeeNotFoundException(){
-        ResponseEntity<ErrorResponse> response = emsControllerAdvice.handleEmployeeNotFoundException(runtimeException,webRequest);
-        assertNotNull(response.getBody());
-        assertEquals(response.getBody().statusCode(), UNAUTHORIZED_STATUS_CODE);
     }
 
     @Test

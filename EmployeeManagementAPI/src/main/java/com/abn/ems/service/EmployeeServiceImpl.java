@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import static com.abn.ems.constant.Constant.*;
+import static com.abn.ems.constants.Constant.*;
 
 /**
  * Implementation of the EmployeeService interface, providing business logic for employee management.

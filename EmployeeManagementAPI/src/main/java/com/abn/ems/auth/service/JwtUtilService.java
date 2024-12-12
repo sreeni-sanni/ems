@@ -12,8 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.function.Function;
 
-import static com.abn.ems.constant.Constant.ALGORITHM;
-import static com.abn.ems.constant.Constant.ROLES;
+import static com.abn.ems.constants.Constant.ALGORITHM;
+import static com.abn.ems.constants.Constant.ROLES;
 
 /**
  * Utility service for generating, parsing, and validating JSON Web Tokens (JWT).

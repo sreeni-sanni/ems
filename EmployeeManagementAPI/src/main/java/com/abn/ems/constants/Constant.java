@@ -1,4 +1,4 @@
-package com.abn.ems.constant;
+package com.abn.ems.constants;
 
 public final class Constant {
 
@@ -13,6 +13,7 @@ public final class Constant {
     public static final String ALGORITHM = "HmacSHA256";
     public static final String ROLES = "roles";
     public static final String TOKEN_MISSING = "Authorization code is missing in the request";
+    public static final String ACCESS_DENIED = "You do not have the required permissions to access this resource.";
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER="Bearer ";
     public static final String ROLE_MISSING="Role is missing in the request header";

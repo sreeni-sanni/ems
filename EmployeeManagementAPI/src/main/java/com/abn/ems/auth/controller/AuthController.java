@@ -12,8 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.abn.ems.constant.Constant.AUTH_TOKEN;
-import static com.abn.ems.constant.Constant.USER_NOT_FOUND;
+import static com.abn.ems.constants.Constant.AUTH_TOKEN;
+import static com.abn.ems.constants.Constant.USER_NOT_FOUND;
 
 @Slf4j
 @AllArgsConstructor

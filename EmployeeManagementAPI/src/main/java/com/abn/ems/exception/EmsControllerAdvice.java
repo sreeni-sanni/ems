@@ -1,10 +1,7 @@
 package com.abn.ems.exception;
 
 import com.abn.ems.model.ErrorResponse;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authorization.AuthorizationDeniedException;
@@ -13,12 +10,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
-import static com.abn.ems.constant.Constant.*;
+import static com.abn.ems.constants.Constant.*;
 /**
  * Global exception handler for the Employee Management System (EMS) application.
  *
@@ -51,7 +46,7 @@ public class EmsControllerAdvice {
     @ExceptionHandler(AuthorizationDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationDeniedException(AuthorizationDeniedException exception, WebRequest webRequest) {
         log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(getErrorDetails(exception.getMessage(), HttpStatus.UNAUTHORIZED, webRequest));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(getErrorDetails(ACCESS_DENIED, HttpStatus.UNAUTHORIZED, webRequest));
     }
 
     @ExceptionHandler(Exception.class)

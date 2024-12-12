@@ -13,18 +13,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
-import static com.abn.ems.constant.Constant.*;
+import static com.abn.ems.constants.Constant.*;
 import static java.util.Arrays.stream;
 
 /**
@@ -43,14 +43,21 @@ import static java.util.Arrays.stream;
  *     <li>Delegates the request to the next filter in the chain if the token is invalid or missing.</li>
  * </ul>
  */
-@AllArgsConstructor
+
 @Component
 @Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private JwtUtilService jwtUtilService;
-    private EmployeeService employeeService;
-    private JWTAuthenticationProvider provider;
+    private final JwtUtilService jwtUtilService;
+    private final JWTAuthenticationProvider provider;
+
+    private final HandlerExceptionResolver resolver;
+
+    public JwtAuthFilter(@Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver,JwtUtilService jwtUtilService,JWTAuthenticationProvider provider) {
+        this.resolver = resolver;
+        this.jwtUtilService = jwtUtilService;
+        this.provider = provider;
+    }
 
     /**
      * Filters the incoming request to validate the JWT token.
@@ -71,22 +78,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        String token = getTokenFromRequest(request);
         try {
-            if (StringUtils.hasText(token) && jwtUtilService.validateToken(token)) {
-                Authentication authentication = provider.authenticate(new UsernamePasswordAuthenticationToken(token, token));
-                if (authentication != null) {
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = getTokenFromRequest(request);
+            try {
+                if (StringUtils.hasText(token) && jwtUtilService.validateToken(token)) {
+                    Authentication authentication = provider.authenticate(new UsernamePasswordAuthenticationToken(token, token));
+                    if (authentication != null) {
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
+            } catch (SignatureException | ExpiredJwtException exe) {
+                if (exe instanceof SignatureException) {
+                    throw new JwtException(INVALID_JWT_TOKEN);
+                } else {
+                    throw new JwtException(TOKEN_EXPIRED);
                 }
             }
-        } catch (SignatureException | ExpiredJwtException exe) {
-            if (exe instanceof SignatureException) {
-                throw new JwtException(INVALID_JWT_TOKEN);
-            } else {
-                throw new JwtException(TOKEN_EXPIRED);
-            }
+            filterChain.doFilter(request, response);
+        } catch (RuntimeException e) {
+            resolver.resolveException(request, response, null, e);
         }
-        filterChain.doFilter(request, response);
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {

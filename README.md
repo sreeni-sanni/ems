@@ -63,7 +63,7 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### 1. Generate Authentication Token
 - **Endpoint:** `POST /auth/token`
-- **Description:** Generate a JWT token for authenticated access to the API.
+- **Description:** Generate a JWT token using for authenticated access to the API.
 - **Request Body:**
 ```json
 {
@@ -168,20 +168,23 @@ Authorization: Bearer <JWT_TOKEN>
 
 
 ## Usage Example
+1. **Creating a JWT Token:**
 
-1. **Creating a new employee:**
+    - Send a `POST` request to `/auth/token` with the userName in the body  (Please use admin as userName first to create token).
 
-    - Send a `POST` request to `/employees` with the employee details in the body and a `Role` in the header (e.g., `Role: ADMIN`).
+2. **Creating a new employee:**
 
-2. **Retrieving employee details by ID:**
+    - Send a `POST` request to `/employees` with the employee details in the body and a `Role` in the header (e.g., `Role: admin` same role will be assigned to employee).
+
+3. **Retrieving employee details by ID:**
 
     - Send a `GET` request to `/employees/{id}` with the employee ID in the URL and a `Role` in the header (e.g., `Role: ADMIN`).
 
-3. **Updating an employee:**
+4. **Updating an employee:**
 
     - Send a `PUT` request to `/employees/{id}` with the updated employee details and a `Role` in the header.
 
-4. **Deleting an employee:**
+5. **Deleting an employee:**
 
     - Send a `DELETE` request to `/employees/{id}` with the employee ID in the URL and a `Role` in the header.
 

@@ -3,7 +3,7 @@ package com.abn.ems.Enums;
 import com.abn.ems.exception.RoleNotFoundException;
 import lombok.Getter;
 
-import static com.abn.ems.constant.Constant.ROLE_NOT_FOUND;
+import static com.abn.ems.constants.Constant.ROLE_NOT_FOUND;
 
 /**
  * Enum representing the various roles available in the application.
