@@ -24,7 +24,7 @@ public class RoleServiceImpl implements RoleService{
     @Override
     public String deleteRole(Long roleId) {
         try {
-            roleRepository.deleteById(roleId);
+            roleRepository.deleteRoleById(roleId);
         }catch (Exception e){
             throw new RoleNotFoundException(e.getMessage());
         }

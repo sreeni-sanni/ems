@@ -139,7 +139,7 @@ Authorization: Bearer <JWT_TOKEN>
 - **Endpoint:** `DELETE /employees/{id}`
 - **Description:** Delete an employee from the system based on their unique ID.
 - **Request Header:**
-    - `Role`: Role of the user (e.g., `USER`).
+    - `Role`: Role of the user (e.g., `ADMIN`).
 - **Response:**
 ```json
 {

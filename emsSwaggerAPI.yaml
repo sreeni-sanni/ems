@@ -1,0 +1,190 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8080
+    description: Employee Management System
+paths:
+  /employees/{id}:
+    get:
+      security:
+      - bearerAuth: []
+      tags:
+        - employee-controller
+      operationId: getEmployee
+      summary: Retrieve Employee Details
+      description: Fetch details of an employee by their unique ID.
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the employee.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Employee details retrieved successfully.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/EmployeeResponse'
+    put:
+      security:
+      - bearerAuth: []
+      tags:
+        - employee-controller
+      operationId: updateEmployee
+      summary: Update Employee Details
+      description: Update the information of an existing employee identified by their unique ID.
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the employee.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Updated details of the employee.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeRequest'
+        required: true
+      responses:
+        '200':
+          description: Employee details updated successfully.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/EmployeeResponse'
+    delete:
+      security:
+      - bearerAuth: []
+      tags:
+        - employee-controller
+      operationId: deleteEmployee
+      summary: Delete an Employee
+      description: Remove an employee record from the system based on their unique ID.
+      parameters:
+        - name: id
+          in: path
+          description: Unique identifier of the employee.
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Employee deleted successfully.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ResponseMessage'
+  /employees:
+    post:
+      security:
+      - bearerAuth: []
+      tags:
+        - employee-controller
+      operationId: addEmployee
+      summary: Add a New Employee
+      description: Create a new employee record in the system.
+      parameters:
+        - name: Role
+          in: header
+          description: The role of the user performing the operation. This is required for authorization.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Details of the new employee.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeRequest'
+        required: true
+      responses:
+        '200':
+          description: Employee added successfully.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/EmployeeResponse'
+  /auth/token:
+    post:
+      tags:
+        - auth-controller
+      operationId: getToken
+      summary: Generate Authentication Token
+      description: Obtain a JWT token for authenticated access to the API.
+      requestBody:
+        description: User credentials for authentication.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+        required: true
+      responses:
+        '200':
+          description: JWT token generated successfully.
+          content:
+            '*/*':
+              schema:
+                type: string
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    EmployeeRequest:
+      required:
+        - firstName
+        - surName
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: First name of the employee.
+        surName:
+          type: string
+          description: Last name (surname) of the employee.
+        roleId:
+          type: integer
+          format: int64
+          description: Role ID associated with the employee.
+    EmployeeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier of the employee.
+        firstName:
+          type: string
+          description: First name of the employee.
+        surName:
+          type: string
+          description: Last name (surname) of the employee.
+        roleId:
+          type: integer
+          format: int64
+          description: Role ID associated with the employee.
+    AuthRequest:
+      required:
+        - username
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username of the user requesting authentication.
+    ResponseMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Success or error message related to the operation.

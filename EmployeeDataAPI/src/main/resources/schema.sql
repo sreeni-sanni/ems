@@ -17,3 +17,7 @@ CREATE TABLE  IF NOT EXISTS Project (
                          employee_id INT,
                          FOREIGN KEY (employee_id) REFERENCES Employee(id)
 );
+
+-- create index on surName column
+CREATE INDEX surName_index ON Employee (surName);
+

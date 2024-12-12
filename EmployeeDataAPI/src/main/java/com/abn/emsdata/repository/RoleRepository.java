@@ -11,7 +11,7 @@ import java.util.UUID;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
 
-    @Query(value="CALL delete_role_procedure(:id)", nativeQuery = true)
+    @Query(value="CALL DeleteRoleWithEmployeesAndReassignProjects(:id,1300)", nativeQuery = true)
     void deleteRoleById(@Param("id")Long id);
 
 }
