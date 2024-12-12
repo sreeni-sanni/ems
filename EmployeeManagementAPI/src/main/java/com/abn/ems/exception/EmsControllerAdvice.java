@@ -50,9 +50,13 @@ public class EmsControllerAdvice {
         return ResponseEntity.badRequest().body(getErrorDetails(exception.getMessage(), HttpStatus.BAD_REQUEST, webRequest));
     }
     @ExceptionHandler(EmployeeDataAPIException.class)
-    public ResponseEntity<ErrorResponse> handleRoleNotFoundException(EmployeeDataAPIException exception, WebRequest webRequest) throws JsonProcessingException {
+    public ResponseEntity<ErrorResponse> handleRoleNotFoundException(EmployeeDataAPIException exception, WebRequest webRequest)  {
         log.error(EXCEPTION_OCCURRED, exception.getMessage(), exception);
-        return ResponseEntity.badRequest().body(getErrorDetails(getMessage(exception.getMessage()), HttpStatus.BAD_REQUEST, webRequest));
+        try{
+            return ResponseEntity.badRequest().body(getErrorDetails(getMessage(exception.getMessage()), HttpStatus.BAD_REQUEST, webRequest));
+        }catch (JsonProcessingException e){
+            return ResponseEntity.badRequest().body(getErrorDetails(exception.getMessage(), HttpStatus.BAD_REQUEST, webRequest));
+        }
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)
