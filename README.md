@@ -25,14 +25,14 @@ User will generate a JWT token encoding their roles.
 
 - Every request is validated against the user’s role in Role filter.
 ### Retry Mechanism :
-- While interacting with EmployeeDataAPI if service unavailable it retries three times.
+- EmployeeDataAPI is resilient and retries three times in case of any technical issues.
 ### Database Interaction:
 
 The EmployeeManagementAPI forwards valid requests to the EmployeeDataAPI for data storage or retrieval.
 ### Role-Based Access Controls
 Actions are restricted to authorized roles:
 
-- Admin: will create and delete employee.
+- Admin: Can create and delete a employee.
 - User: Restricted to viewing  and update their own information.
 ### Internal Communication
 - EmployeeManagementAPI serves as the public interface for clients.
