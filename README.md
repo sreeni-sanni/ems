@@ -49,6 +49,7 @@ Actions are restricted to authorized roles:
 
 ## Base URL
 - `http://localhost:8080`
+- Swagger-UI URL 'http://localhost:8080/swagger-ui/index.html'
 
 ## Security
 The API uses Bearer Authentication (JWT). Include a valid token in the `Authorization` header of your requests to access the protected endpoints.
