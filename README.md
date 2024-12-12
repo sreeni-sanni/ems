@@ -165,9 +165,6 @@ Authorization: Bearer <JWT_TOKEN>
 ### ResponseMessage
 - **message**: A success message related to the Delete employee operation.
 
-## Security Scheme
-The API uses the `bearerAuth` security scheme, which is a bearer token for authentication.
-
 
 ## Usage Example
 
