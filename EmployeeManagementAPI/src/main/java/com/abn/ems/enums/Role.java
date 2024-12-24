@@ -1,4 +1,4 @@
-package com.abn.ems.Enums;
+package com.abn.ems.enums;
 
 import com.abn.ems.exception.RoleNotFoundException;
 import lombok.Getter;

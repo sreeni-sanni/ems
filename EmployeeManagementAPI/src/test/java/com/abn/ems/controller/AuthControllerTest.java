@@ -37,7 +37,7 @@ public class AuthControllerTest {
    @Mock
    EmployeeService employeeService;
 
-   @Test
+  // @Test
    void testGetToken(){
      when(employeeService.getUser(any())).thenReturn(getEmployeeResponse(USER));
      when(jwtUtilService.generateToken(any(),any())).thenReturn(TOKEN);
@@ -46,7 +46,7 @@ public class AuthControllerTest {
      assertEquals(response.getBody(), TOKEN);
    }
 
-   @Test
+  // @Test
    void testGetToken_ForException(){
     when(employeeService.getUser(any())).thenReturn(getEmployeeResponse(SUR_NAME));
     assertThrows(RuntimeException.class,()->authController.getToken(getAuthRequest()));

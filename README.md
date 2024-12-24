@@ -170,7 +170,7 @@ Authorization: Bearer <JWT_TOKEN>
 ## Usage Example
 1. **Creating a JWT Token:**
 
-    - Send a `POST` request to `/auth/token` with the userName in the body  (Please use admin as userName first to create token).
+    - Send a `POST` request to `/auth/token` with the userName in the body  (Please use `admin` as userName first to create token).
 
 2. **Creating a new employee:**
 

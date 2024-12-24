@@ -1,6 +1,6 @@
 package com.abn.ems.filter;
 
-import com.abn.ems.Enums.Role;
+import com.abn.ems.enums.Role;
 import com.abn.ems.exception.RoleNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

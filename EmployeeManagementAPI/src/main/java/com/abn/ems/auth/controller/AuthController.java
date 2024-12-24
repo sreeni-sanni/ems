@@ -1,11 +1,11 @@
 package com.abn.ems.auth.controller;
 
-import com.abn.ems.Enums.Role;
 import com.abn.ems.auth.model.AuthRequest;
+import com.abn.ems.auth.service.AuthServiceImpl;
 import com.abn.ems.auth.service.JwtUtilService;
+import com.abn.ems.enums.Role;
 import com.abn.ems.exception.EmsApplicationException;
 import com.abn.ems.model.EmployeeResponse;
-import com.abn.ems.service.EmployeeService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class AuthController {
 
     private JwtUtilService jwtUtilService;
 
-    private EmployeeService employeeService;
+    private AuthServiceImpl authServiceImpl;
 
     /**
      *  * Generates a JWT token for the given username.
@@ -37,7 +37,7 @@ public class AuthController {
     @PostMapping(AUTH_TOKEN)
     public ResponseEntity<String> getToken(@RequestBody @Valid AuthRequest authRequest ) {
 
-        EmployeeResponse employee=employeeService.getUser(authRequest.username());
+        EmployeeResponse employee=authServiceImpl.getEmployee(authRequest.username());
         if (employee.surName().equalsIgnoreCase(authRequest.username())) {
            String token= jwtUtilService.generateToken(employee.surName(), Role.getRole(employee.roleId()));
             return ResponseEntity.ok(token);

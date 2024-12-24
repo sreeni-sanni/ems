@@ -1,6 +1,6 @@
 package com.abn.ems.service;
 
-import com.abn.ems.Enums.Role;
+import com.abn.ems.enums.Role;
 import com.abn.ems.exception.EmployeeDataAPIException;
 import com.abn.ems.exception.RoleNotFoundException;
 import com.abn.ems.mapper.EmployeeMapper;
@@ -15,6 +15,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
@@ -66,7 +67,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         try {
             employeeDataResponse = restTemplate.getForObject(basePath + API_EMPLOYEE_BY_NAME, EmployeeDataResponse.class, userName);
-        } catch (HttpClientErrorException e) {
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new EmployeeDataAPIException(e.getResponseBodyAsString());
         }
 
@@ -89,7 +90,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         request.setRoleId(Role.getRoleId(role));
         try {
             employeeDataResponse = restTemplate.postForObject(basePath + API_EMPLOYEE, request, EmployeeDataResponse.class);
-        } catch (HttpClientErrorException e) {
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new EmployeeDataAPIException(e.getResponseBodyAsString());
         }
         return employeeMapper.toEmployeeResponse(employeeDataResponse);
@@ -116,7 +117,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             EmployeeDataResponse employeeResponse;
             try {
                 employeeResponse = restTemplate.exchange(basePath + API_EMPLOYEE_BY_ID, HttpMethod.PUT, requestEntity, EmployeeDataResponse.class, id).getBody();
-            } catch (HttpClientErrorException e) {
+            } catch (HttpClientErrorException | HttpServerErrorException e) {
                 throw new EmployeeDataAPIException(e.getResponseBodyAsString());
             }
             return employeeMapper.toEmployeeResponse(employeeResponse);
@@ -138,7 +139,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public ResponseMessage delete(Long id) {
         try {
             return restTemplate.exchange(basePath + API_EMPLOYEE_BY_ID, HttpMethod.DELETE, getHeaders(), ResponseMessage.class, id).getBody();
-        } catch (HttpClientErrorException e) {
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new EmployeeDataAPIException(e.getResponseBodyAsString());
         }
     }
